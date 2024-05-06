@@ -19,6 +19,22 @@ banner_help = """ \x1b[38;5;196mDISPLAY  %s  \x1b[38;5;202mBANNER   %s  \x1b[38;
           \x1b[38;5;77m%s \x1b[38;5;205m║ TOTAL ║
           \x1b[38;5;76m%s \x1b[38;5;205m╚═══════╝\x1b[0m"""
 
+banner_meth = """\x1b[38;5;196m╔════════════╦═════╦═╦═════╦═╦══════════════════════════════════════════
+\x1b[38;5;197m║ \x1b[38;5;255mMETHODS    \x1b[38;5;197m║ \x1b[38;5;255mBOT \x1b[38;5;197m║ ║ \x1b[38;5;255mAPI \x1b[38;5;197m║ ║ \x1b[38;5;255mDESCRIPTIONS
+\x1b[38;5;198m╠════════════╬═════╬═╬═════╬═╬══════════════════════════════════════════
+\x1b[38;5;199m║ \x1b[38;5;215mHTTP-19    \x1b[38;5;199m║ \x1b[38;5;226mYES \x1b[38;5;199m║\x1b[38;5;226m█\x1b[38;5;199m║ \x1b[38;5;76mYES \x1b[38;5;199m║\x1b[38;5;76m█\x1b[38;5;199m║ \x1b[38;5;255mHTTP FLOODING
+\x1b[38;5;200m║ \x1b[38;5;214mBROWSER    \x1b[38;5;200m║ \x1b[38;5;165mNOT \x1b[38;5;200m║\x1b[38;5;165m░\x1b[38;5;200m║ \x1b[38;5;76mYES \x1b[38;5;200m║\x1b[38;5;76m█\x1b[38;5;200m║ \x1b[38;5;255mHTTPS FLOODING LIKE BROWSER
+\x1b[38;5;201m║ \x1b[38;5;215mHANDSHAKE  \x1b[38;5;201m║ \x1b[38;5;165mNOT \x1b[38;5;201m║\x1b[38;5;165m░\x1b[38;5;201m║ \x1b[38;5;76mYES \x1b[38;5;201m║\x1b[38;5;76m█\x1b[38;5;201m║ \x1b[38;5;255mSHORT TIME PEAK RP/S
+\x1b[38;5;200m║ \x1b[38;5;214mAMP        \x1b[38;5;200m║ \x1b[38;5;165mNOT \x1b[38;5;200m║\x1b[38;5;165m░\x1b[38;5;200m║ \x1b[38;5;76mYES \x1b[38;5;200m║\x1b[38;5;76m█\x1b[38;5;200m║ \x1b[38;5;255mLARGE PACKET FLOODING
+\x1b[38;5;199m║ \x1b[38;5;214mMURD-OPT   \x1b[38;5;199m║ \x1b[38;5;165mNOT \x1b[38;5;199m║\x1b[38;5;165m░\x1b[38;5;199m║ \x1b[38;5;76mYES \x1b[38;5;199m║\x1b[38;5;76m█\x1b[38;5;199m║ \x1b[38;5;255mKILLER OF WEBSITE
+\x1b[38;5;198m║ \x1b[38;5;215mMURD       \x1b[38;5;198m║ \x1b[38;5;165mNOT \x1b[38;5;198m║\x1b[38;5;165m░\x1b[38;5;198m║ \x1b[38;5;76mYES \x1b[38;5;198m║\x1b[38;5;76m█\x1b[38;5;198m║ \x1b[38;5;255mKILLER WEBSITE WITH LIKE CLIENT MORE
+\x1b[38;5;197m║ \x1b[38;5;214mRAPID-FAST \x1b[38;5;197m║ \x1b[38;5;165mNOT \x1b[38;5;197m║\x1b[38;5;165m░\x1b[38;5;197m║ \x1b[38;5;76mYES \x1b[38;5;197m║\x1b[38;5;76m█\x1b[38;5;197m║ \x1b[38;5;255mCONNECTION FLOODING
+\x1b[38;5;196m║ \x1b[38;5;215mCOOKIE2    \x1b[38;5;196m║ \x1b[38;5;165mNOT \x1b[38;5;196m║\x1b[38;5;165m░\x1b[38;5;196m║ \x1b[38;5;76mYES \x1b[38;5;196m║\x1b[38;5;76m█\x1b[38;5;196m║ \x1b[38;5;255mRANDOM COOKIE LIKE CLIENT
+\x1b[38;5;197m║ \x1b[38;5;214mCOOKIE     \x1b[38;5;197m║ \x1b[38;5;165mNOT \x1b[38;5;197m║\x1b[38;5;165m░\x1b[38;5;197m║ \x1b[38;5;76mYES \x1b[38;5;197m║\x1b[38;5;76m█\x1b[38;5;197m║ \x1b[38;5;255mATTACK SOME WEBSITE WITH CDN-HEADER
+\x1b[38;5;198m║ \x1b[38;5;215mTCP-RST    \x1b[38;5;198m║ \x1b[38;5;226mYES \x1b[38;5;198m║\x1b[38;5;226m█\x1b[38;5;198m║ \x1b[38;5;80mNOT \x1b[38;5;198m║\x1b[38;5;80m░\x1b[38;5;198m║ \x1b[38;5;255mMASSIVE RESET PACKET
+\x1b[38;5;199m║ \x1b[38;5;214mUDP-STORM  \x1b[38;5;199m║ \x1b[38;5;226mYES \x1b[38;5;199m║\x1b[38;5;226m█\x1b[38;5;199m║ \x1b[38;5;80mNOT \x1b[38;5;199m║\x1b[38;5;80m░\x1b[38;5;199m║ \x1b[38;5;255mFLOODING PACKET WITH UDP
+\x1b[38;5;200m╚════════════╩═════╩═╩═════╩═╩══════════════════════════════════════════\x1b[0m""".split("\n")
+
 ascii_art = ["║","┃","│"]
 ascii_art2 = ["═", "━", "─"]
 ascii_art3 = ["█","▓","▒","░"]
