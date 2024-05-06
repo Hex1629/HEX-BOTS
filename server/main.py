@@ -1,6 +1,6 @@
 import socket,random,string,base64,threading,time
 from Encryptor import AES_Encryption
-from clients.banner import create_banner,create_HELP
+from clients.banner import create_banner,create_HELP,banner_meth
 login = [['ROOT','ROOT'],['ADMIN','ADMIN'],['HEX','HEX']]
 
 def random_unique(length):
@@ -132,6 +132,9 @@ def client_command(s,u):
       elif com[0] == 'MENU':
         s.send(b'\033[2J\033[H')
         for a in create_banner("main",[time.ctime(),str(len(bots)),u]):s.send((a+'\r\n').encode()); time.sleep(0.1)
+      elif com[0] in ['METH','METHODS','HUB','LIST']:
+        for a in banner_meth:
+         s.send((a+'\r\n').encode()); time.sleep(0.1)
       elif com[0] == 'HELP':
         for a in create_HELP():
          s.send((a+'\r\n').encode()); time.sleep(0.1)
