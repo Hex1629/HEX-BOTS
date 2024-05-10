@@ -28,13 +28,13 @@ def fast_check(a,mode=1,opt={"User-Agent":"Hex-Bots/API 2024.05.101 TEST"},junk=
     else:
       l = a.replace("https://","").replace("http://","")
       if r.status_code == 404 and title != 'Run this Repl to see the results here.':
-        junk.send(f'\x1b[38;5;76mSENDING ATTACK DONE \x1b[38;5;255m--> \x1b[38;5;81mapi://{random_unique(len(l))\x1b[0m\r\n'.encode())
+        junk.send(f'\x1b[38;5;76mSENDING ATTACK DONE \x1b[38;5;255m--> \x1b[38;5;81mapi://{random_unique(len(l))}\x1b[0m\r\n'.encode())
       else:
-        junk.send(f'\x1b[38;5;196mSENDING ATTACK FAILED \x1b[38;5;255m--> \x1b[38;5;197mapi://{random_unique(len(l))\x1b[0m\r\n'.encode())
+        junk.send(f'\x1b[38;5;196mSENDING ATTACK FAILED \x1b[38;5;255m--> \x1b[38;5;197mapi://{random_unique(len(l))}\x1b[0m\r\n'.encode())
   except:
     if mode == 1:offline += 1
     else:
-      junk.send(f'\x1b[38;5;196mSENDING ATTACK FAILED \x1b[38;5;255m--> \x1b[38;5;197mapi://{random_unique(len(l))\x1b[0m\r\n'.encode())
+      junk.send(f'\x1b[38;5;196mSENDING ATTACK FAILED \x1b[38;5;255m--> \x1b[38;5;197mapi://{random_unique(len(l))}\x1b[0m\r\n'.encode())
 
 def check_api():
    global offline,online
